@@ -26,7 +26,8 @@ def test_csr_mismatch():
     
     # Initialize parser and decoder
     spec_path = "riscv-unified-db/spec/std/isa/csr"
-    parser = UDBParser(spec_path)
+    config_yaml = "riscv-config/examples/rv64i_isa_checked.yaml"
+    parser = UDBParser(spec_path, riscv_config_yaml=config_yaml)
     parser.load_all()
     decoder = Decoder(xlen=64)
     
@@ -58,13 +59,15 @@ def test_csr_mismatch():
         ref_decoded = decoder.decode_value(csr, ref_val)
         for f in ref_decoded:
             bits = f"[{f['msb']}:{f['lsb']}]" if f['msb'] != f['lsb'] else f"[{f['msb']}]"
-            print(f"  {f['name']:20} {bits:10} = {f['bin']:>10} ({f['value']:>5}) {f.get('desc', '')}")
+            access_type = f" ({f['access_type']})" if f.get('access_type') else ""
+            print(f"  {f['name']:20} {bits:10} = {f['bin']:>10} ({f['value']:>5}){access_type} {f.get('desc', '')}")
         
         print(f"\n--- DUT Value Decoding ---")
         dut_decoded = decoder.decode_value(csr, dut_val)
         for f in dut_decoded:
             bits = f"[{f['msb']}:{f['lsb']}]" if f['msb'] != f['lsb'] else f"[{f['msb']}]"
-            print(f"  {f['name']:20} {bits:10} = {f['bin']:>10} ({f['value']:>5}) {f.get('desc', '')}")
+            access_type = f" ({f['access_type']})" if f.get('access_type') else ""
+            print(f"  {f['name']:20} {bits:10} = {f['bin']:>10} ({f['value']:>5}){access_type} {f.get('desc', '')}")
         
         # Show differences
         print(f"\n--- Differences ---")
@@ -73,7 +76,8 @@ def test_csr_mismatch():
             if f1['value'] != f2['value']:
                 differences_found = True
                 bits = f"[{f1['msb']}:{f1['lsb']}]" if f1['msb'] != f1['lsb'] else f"[{f1['msb']}]"
-                print(f"  {f1['name']:20} {bits:10}: REF={f1['bin']:>10} ({f1['value']:>5}) vs DUT={f2['bin']:>10} ({f2['value']:>5})")
+                access_type = f" ({f1['access_type']})" if f1.get('access_type') else ""
+                print(f"  {f1['name']:20} {bits:10}: REF={f1['bin']:>10} ({f1['value']:>5}) vs DUT={f2['bin']:>10} ({f2['value']:>5}){access_type}")
                 print(f"    Description: {f1.get('desc', 'N/A')}")
         
         if not differences_found:

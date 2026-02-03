@@ -52,6 +52,7 @@ def main(argv=None):
     # common args
     def add_common(parser):
         parser.add_argument("--spec", required=True, help="Path to riscv-unified-db spec/csrs directory")
+        parser.add_argument("--config", help="Path to riscv-config YAML (e.g., rv64i_isa_checked.yaml) for CSR type info (WARL/WLRL)")
         parser.add_argument("--xlen", type=int, default=64, help="XLEN (default 64)")
         parser.add_argument("--json", action="store_true", help="Output machine-readable JSON")
 
@@ -73,7 +74,7 @@ def main(argv=None):
 
     args = p.parse_args(argv)
 
-    parser = UDBParser(args.spec)
+    parser = UDBParser(args.spec, riscv_config_yaml=args.config if hasattr(args, 'config') else None)
     csrs = parser.load_all()
     csr = parser.get(args.csr)
     if csr is None:
