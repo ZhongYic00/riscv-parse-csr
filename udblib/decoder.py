@@ -11,7 +11,7 @@ class Decoder:
     def decode_value(self, csr: CSRDefinition, value: int) -> List[Dict[str, Any]]:
         """
         Decode full value into fields.
-        Returns list of dicts with keys: name, msb, lsb, width, raw_value, hex, bin, desc
+        Returns list of dicts with keys: name, msb, lsb, width, raw_value, hex, bin, desc, access_type
         """
         out = []
         for f in sorted(csr.fields, key=lambda ff: ff.msb, reverse=True):
@@ -24,7 +24,8 @@ class Decoder:
                 "value": int(raw),
                 "hex": hex(int(raw)),
                 "bin": bin(int(raw)),
-                "desc": f.desc
+                "desc": f.desc,
+                "access_type": f.access_type if hasattr(f, 'access_type') else ""
             })
         return out
 
@@ -47,6 +48,7 @@ class Decoder:
                     "changed_mask": hex(changed),
                     "changed_rel": hex(rel),
                     "changed_bits_count": changed.bit_count(),
-                    "desc": f.desc
+                    "desc": f.desc,
+                    "access_type": f.access_type if hasattr(f, 'access_type') else ""
                 })
         return out
