@@ -19,17 +19,20 @@ def pretty_print_decode(name, decoded, compact=True):
     if compact:
         for f in decoded:
             bits = f"[{f['msb']}:{f['lsb']}]" if f['msb'] != f['lsb'] else f"[{f['msb']}]"
-            print(f"{f['name']}{bits}={f['bin']}", end=', ')
+            access_type = f" ({f['access_type']})" if f.get('access_type') else ""
+            print(f"{f['name']}{bits}={f['bin']}{access_type}", end=', ')
     else:
         for f in decoded:
-            print(f" {f['name']:20} [{f['msb']:2d}:{f['lsb']:2d}] = {f['hex']:>6} / {f['value']:>3} / {f['bin']:>10}")
+            access_type = f" ({f['access_type']})" if f.get('access_type') else ""
+            print(f" {f['name']:20} [{f['msb']:2d}:{f['lsb']:2d}] = {f['hex']:>6} / {f['value']:>3} / {f['bin']:>10}{access_type}")
             #  {f.get('desc','')}
     print()
 
 def pretty_print_diff(name, diffs):
     print(f"CSR: {name} (fields with changes)")
     for d in diffs:
-        print(f" {d['name']:20} [{d['msb']:2d}:{d['lsb']:2d}] changed_mask={d['changed_mask']:>10} rel={d['changed_rel']:>6} bits_changed={d['changed_bits_count']:>2}  {d.get('desc','')}")
+        access_type = f" ({d['access_type']})" if d.get('access_type') else ""
+        print(f" {d['name']:20} [{d['msb']:2d}:{d['lsb']:2d}] changed_mask={d['changed_mask']:>10} rel={d['changed_rel']:>6} bits_changed={d['changed_bits_count']:>2}{access_type}  {d.get('desc','')}")
     print()
 
 def pretty_print_compare(name, decoded1, decoded2, compact=False):
@@ -38,11 +41,13 @@ def pretty_print_compare(name, decoded1, decoded2, compact=False):
         for f1, f2 in zip(decoded1, decoded2):
             if f1['value'] != f2['value']:
                 bits = f"[{f1['msb']}:{f1['lsb']}]" if f1['msb'] != f1['lsb'] else f"[{f1['msb']}]"
-                print(f"{f1['name']}{bits}={f1['bin']} vs {f2['bin']}", end=', ')
+                access_type = f" ({f1['access_type']})" if f1.get('access_type') else ""
+                print(f"{f1['name']}{bits}={f1['bin']} vs {f2['bin']}{access_type}", end=', ')
     else:
         for f1, f2 in zip(decoded1, decoded2):
             if f1['value'] != f2['value']:
-                print(f" {f1['name']:20} [{f1['msb']:2d}:{f1['lsb']:2d}] = {f1['hex']:>6} / {f1['value']:>3} / {f1['bin']:>10} vs {f2['hex']:>6} / {f2['value']:>3} / {f2['bin']:>10} \"{f1['desc']}\"")
+                access_type = f" ({f1['access_type']})" if f1.get('access_type') else ""
+                print(f" {f1['name']:20} [{f1['msb']:2d}:{f1['lsb']:2d}] = {f1['hex']:>6} / {f1['value']:>3} / {f1['bin']:>10} vs {f2['hex']:>6} / {f2['value']:>3} / {f2['bin']:>10}{access_type} \"{f1['desc']}\"")
     print()
 
 def main(argv=None):
